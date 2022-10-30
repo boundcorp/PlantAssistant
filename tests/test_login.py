@@ -15,7 +15,6 @@ async def test_register(client: AsyncClient):
     assert created["email"] == email
     
     obj = await User.get(id=created["id"])
-    print(str(obj.pk), created["id"])
     assert str(obj.pk) == str(created["id"])
 
 @pytest.mark.anyio

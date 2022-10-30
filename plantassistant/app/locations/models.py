@@ -47,6 +47,7 @@ class Garden(models.Model, common.UUID, common.Timestamp, common.Name):
         with open('tests/fixtures/weather/basic.yaml') as fh:
             data = yaml.safe_load(fh)
             set_weather = property.post_ha(f"/api/states/{self.ha_weather_entity_id}", json=data)
+            print(set_weather)
         weather = property.get_ha(f"/api/states/{self.ha_weather_entity_id}").json()
 
         return weather["state"]
