@@ -1,0 +1,11 @@
+-i https://pypi.org/simple
+pytest
+pytest-mock
+mypy
+black
+flake8
+autoflake
+httpx
+pytest-asyncio
+strawberry-graphql[debug-server]
+isort

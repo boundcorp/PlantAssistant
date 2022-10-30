@@ -1,0 +1,4 @@
+[tool.aerich]
+tortoise_orm = "plantassistant.settings.TORTOISE_ORM"
+location = "plantassistant/migrations"
+src_folder = "./."

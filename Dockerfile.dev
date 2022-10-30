@@ -1,0 +1,28 @@
+FROM python:3.10-alpine
+
+# Core requirements
+RUN apk add --no-cache \
+    zlib-dev \
+    gcc \
+    python3-dev \
+    postgresql-dev \
+    linux-headers \
+    libffi-dev \
+    build-base \
+    openssl
+
+# Dev Extras
+RUN apk add --no-cache \
+    bash \
+    jq
+
+RUN mkdir -p /workspace/plantassistant
+RUN pip install --no-cache-dir --upgrade pipenv pip
+
+COPY requirements.dev.txt requirements.txt /tmp/pip-tmp/
+RUN pip3 --disable-pip-version-check --no-cache-dir install \
+    -r /tmp/pip-tmp/requirements.dev.txt \
+    -r /tmp/pip-tmp/requirements.txt \
+    && rm -rf /tmp/pip-tmp
+
+WORKDIR /workspace/plantassistant

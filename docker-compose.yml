@@ -1,0 +1,91 @@
+version: "2.1"
+services: 
+  postgres:
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: passw0rd
+      POSTGRES_DB: dev
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  devcontainer:
+    extends:
+      service: devcontainer
+      file: docker/docker-compose._base.yml
+    links:
+      - postgres
+      - redis
+      - homeassistant
+    volumes:
+      - .:/workspace/plantassistant
+    environment:
+      - DATABASE_URL=postgres://dev:passw0rd@postgres:5432/dev
+      - HA_TOKEN
+      - HA_URL
+
+  app:
+    extends:
+      service: devcontainer
+      file: docker/docker-compose._base.yml
+    links:
+      - postgres
+      - redis
+      - homeassistant
+    volumes:
+      - .:/workspace/plantassistant
+    environment:
+      - DATABASE_URL=postgres://dev:passw0rd@postgres:5432/dev
+    command: python3 app.py
+    ports:
+      - 9234:9234
+
+  celery_worker:
+    extends:
+      service: devcontainer
+      file: docker/docker-compose._base.yml
+    links:
+      - postgres
+      - redis
+      - homeassistant
+    volumes:
+      - .:/workspace/plantassistant
+    environment:
+      - DATABASE_URL=postgres://dev:passw0rd@postgres:5432/dev
+    command: celery -A plantassistant.celery worker --loglevel=info --uid=65534
+
+  celery_beat:
+    extends:
+      service: devcontainer
+      file: docker/docker-compose._base.yml
+    links:
+      - postgres
+      - redis
+    volumes:
+      - .:/workspace/plantassistant
+    environment:
+      - DATABASE_URL=postgres://dev:passw0rd@postgres:5432/dev
+    command: celery -A plantassistant.celery beat --loglevel=info --uid=65534 -s /tmp/celerybeat.pid
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2022.10.5
+    ports:
+      - 8123:8123
+    volumes:
+      - homeassistant:/config
+    environment:
+      - TZ=America/Los_Angeles
+    privileged: true
+
+
+volumes:
+  postgres:
+  homeassistant:

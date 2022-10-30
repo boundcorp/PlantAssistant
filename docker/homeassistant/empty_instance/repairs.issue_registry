@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "minor_version": 2,
+  "key": "repairs.issue_registry",
+  "data": {
+    "issues": [
+      {
+        "created": "2022-10-28T00:20:30.768083+00:00",
+        "dismissed_version": null,
+        "domain": "homeassistant_alerts",
+        "is_persistent": false,
+        "issue_id": "cloud.markdown_cloud"
+      }
+    ]
+  }
+}

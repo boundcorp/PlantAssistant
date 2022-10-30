@@ -1,0 +1,12 @@
+-i https://pypi.org/simple
+tortoise-orm[asyncpg]
+fastapi
+requests
+passlib
+python-jose[cryptography]
+fastapi-jwt-auth
+uvicorn[standard]
+strawberry-graphql[fastapi]
+tenacity
+aerich
+celery[redis]

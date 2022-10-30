@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "auth",
+  "data": {
+    "users": [
+      {
+        "id": "18c74de66be4420f8cbc77b5d6d77b1c",
+        "group_ids": [
+          "system-read-only"
+        ],
+        "is_owner": false,
+        "is_active": true,
+        "name": "Home Assistant Content",
+        "system_generated": true,
+        "local_only": false
+      },
+      {
+        "id": "f1ef4250f87c4719bc4582163da819aa",
+        "group_ids": [
+          "system-admin"
+        ],
+        "is_owner": true,
+        "is_active": true,
+        "name": "Plant Tester",
+        "system_generated": false,
+        "local_only": false
+      }
+    ],
+    "groups": [
+      {
+        "id": "system-admin",
+        "name": "Administrators"
+      },
+      {
+        "id": "system-users",
+        "name": "Users"
+      },
+      {
+        "id": "system-read-only",
+        "name": "Read Only"
+      }
+    ],
+    "credentials": [
+      {
+        "id": "525cd5c56fb04a4f800aa16b8fd36f7d",
+        "user_id": "f1ef4250f87c4719bc4582163da819aa",
+        "auth_provider_type": "homeassistant",
+        "auth_provider_id": null,
+        "data": {
+          "username": "plant"
+        }
+      }
+    ],
+    "refresh_tokens": [
+      {
+        "id": "fa104d32a3664528a217fb4ea53b2065",
+        "user_id": "18c74de66be4420f8cbc77b5d6d77b1c",
+        "client_id": null,
+        "client_name": null,
+        "client_icon": null,
+        "token_type": "system",
+        "created_at": "2022-10-28T00:20:30.023698+00:00",
+        "access_token_expiration": 1800.0,
+        "token": "35401b6973e30c598f7617f9d50e8df2303884f3a7f4b0d56655188d8c70a6798cb36be01febe85d4391f8ca8234aaa23cccadae6bc20950f75870d2e0a1f40a",
+        "jwt_key": "49fb98ae03c2d37b06ba017faf2f134c3fb226f4fc5ffb3406660b4d59d8690d7ced0f4058345e15c10e259f7dbcb6fd2fedaa2e71b7522c7db4c66bc75bcfda",
+        "last_used_at": null,
+        "last_used_ip": null,
+        "credential_id": null,
+        "version": "2022.10.5"
+      },
+      {
+        "id": "1fad9e69e9124ed2956c678cf7bd8427",
+        "user_id": "f1ef4250f87c4719bc4582163da819aa",
+        "client_id": "http://localhost:8123/",
+        "client_name": null,
+        "client_icon": null,
+        "token_type": "normal",
+        "created_at": "2022-10-28T00:21:07.457312+00:00",
+        "access_token_expiration": 1800.0,
+        "token": "19e433c11363848ce15dea074b611a6bbc9eb64dc556c651ea5857786df8cd9c784d4a73cd13be5b3e997f82b73ee2fb283c7182bb3335f12f626925aa4d4bcf",
+        "jwt_key": "a0b79347b02e42923350823f669766bfa5193fa6bd2e57e30e0efe829cd641123afa1332a528b1bbb564fe9bddb3b388fdb1ad4528456e69d2bc812d6747adcc",
+        "last_used_at": "2022-10-28T00:21:07.457379+00:00",
+        "last_used_ip": "172.23.0.1",
+        "credential_id": "525cd5c56fb04a4f800aa16b8fd36f7d",
+        "version": "2022.10.5"
+      },
+      {
+        "id": "3d378057bc3148aab1015359cbfadf9f",
+        "user_id": "f1ef4250f87c4719bc4582163da819aa",
+        "client_id": null,
+        "client_name": "PlantAssistant",
+        "client_icon": null,
+        "token_type": "long_lived_access_token",
+        "created_at": "2022-10-28T00:21:19.727367+00:00",
+        "access_token_expiration": 315360000.0,
+        "token": "293fc88be3d37276c1ec27229e74534f90104afbaefee300d07b89056db1df7474169c70ac55ce38f6bb89966de085503070e054d95cdc5af0dced64f10a3349",
+        "jwt_key": "501745195b0b8645778da145a7e059e6cc6701996a870a79a39aaa2cb775683bc8d70eb7a9cf435343ec37fe503ceaa43dde79bdc74e0fdbc44e677db73d6264",
+        "last_used_at": "2022-10-28T00:21:19.727444+00:00",
+        "last_used_ip": null,
+        "credential_id": null,
+        "version": "2022.10.5"
+      }
+    ]
+  }
+}
