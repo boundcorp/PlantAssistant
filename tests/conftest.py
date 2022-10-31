@@ -16,7 +16,8 @@ from plantassistant.app.locations.constants import GardenEnclosure
 from plantassistant.app.locations.models import Property, Garden
 from plantassistant.app.plants.models import Planting
 from plantassistant.app.plants.recipes import IndoorHerbs
-from plantassistant.main import app
+from plantassistant.app.schemes.models import Scheme
+from plantassistant.app_setup import app
 from plantassistant.app.users.models import User
 
 log = logging.getLogger()
@@ -116,25 +117,61 @@ class GardenScenario(CommonScenario):
 
 
 @pytest.fixture(scope="session")
-async def simple_garden(common_scenario: CommonScenario):
+async def indoor_garden(common_scenario: CommonScenario):
     """
     Register the home property and create a garden
     """
-    _property = await Property.create(name="Test Home",
-                                      owner_id=common_scenario.test_user.pk,
-                                      homeassistant_url=HA_URL,
-                                      homeassistant_token=HA_TOKEN)
-    _garden = await Garden.create(name="Test Outdoor Garden", property=_property, enclosure=GardenEnclosure.OUTDOOR,
-                                  ha_zone_entity_id="zone.home", ha_weather_entity_id="weather.home")
+    property_obj = await Property.create(
+        name="Test Home",
+        owner_id=common_scenario.test_user.pk,
+        homeassistant_url=HA_URL,
+        homeassistant_token=HA_TOKEN)
 
     with open('tests/fixtures/weather/basic.yaml') as fh:
-        set_weather = await _property.ha_setstate(_garden.ha_weather_entity_id, yaml.safe_load(fh))
-        log.info("FORCED: updated weather fixture in HomeAssistant", set_weather)
+        set_garden_weather = yaml.safe_load(fh)
+
+    garden = await Garden.create(
+        name="Test Indoor Garden",
+        property=property_obj,
+        enclosure=GardenEnclosure.INDOOR,
+        ha_zone_entity_id="zone.home",
+        ha_weather_entity_id="weather.home",
+        ha_weather=set_garden_weather,  # prepopulate the weather
+    )
 
     return GardenScenario(
         **common_scenario.__dict__,
-        property=_property,
-        garden=_garden,
+        property=property_obj,
+        garden=garden,
+    )
+
+@pytest.fixture(scope="session")
+async def outdoor_garden(common_scenario: CommonScenario):
+    """
+    Register the home property and create a garden
+    """
+    property_obj = await Property.create(
+        name="Test Home",
+        owner_id=common_scenario.test_user.pk,
+        homeassistant_url=HA_URL,
+        homeassistant_token=HA_TOKEN)
+
+    with open('tests/fixtures/weather/basic.yaml') as fh:
+        set_garden_weather = yaml.safe_load(fh)
+
+    garden = await Garden.create(
+        name="Test Outdoor Garden",
+        property=property_obj,
+        enclosure=GardenEnclosure.OUTDOOR,
+        ha_zone_entity_id="zone.home",
+        ha_weather_entity_id="weather.home",
+        ha_weather=set_garden_weather,  # prepopulate the weather
+    )
+
+    return GardenScenario(
+        **common_scenario.__dict__,
+        property=property_obj,
+        garden=garden,
     )
 
 
@@ -144,13 +181,28 @@ class PlantingScenario(GardenScenario):
 
 
 @pytest.fixture(scope="session")
-async def indoor_herbs(simple_garden: GardenScenario):
+async def outdoor_fruits(outdoor_garden: GardenScenario):
+    """
+    Create a planting of some outdoor fruits
+    """
+    fruits_scheme = await Scheme.create(name="Outdoor Fruits", owner_id=outdoor_garden.test_user.pk)
+
+    return PlantingScenario(
+        **outdoor_garden.__dict__,
+        plantings=[
+            await Planting.create(name="Tomato", garden=outdoor_garden.garden, scheme=fruits_scheme),
+        ]
+    )
+
+@pytest.fixture(scope="session")
+async def indoor_herbs(indoor_garden):
     """
     Create a planting of some indoor herbs
     """
+    herbs_scheme = await Scheme.create(name="Indoor Herbs", owner_id=indoor_garden.test_user.pk)
     return PlantingScenario(
-        **simple_garden.__dict__,
+        **indoor_garden.__dict__,
         plantings=[
-            await Planting.create(name="Basil", garden=simple_garden.garden, recipe=IndoorHerbs.json()),
+            await Planting.create(name="Basil", garden=indoor_garden.garden, scheme=herbs_scheme),
         ]
     )

@@ -49,13 +49,13 @@ class Garden(models.Model, common.UUID, common.Timestamp, common.Name):
     )
 
     enclosure = fields.CharEnumField(GardenEnclosure, default=GardenEnclosure.OUTDOOR)
+    ha_last_update = fields.DatetimeField(null=True)
     ha_zone_entity_id = fields.CharField(max_length=255, null=True)
     ha_zone = fields.JSONField(null=True)
     ha_weather_entity_id = fields.CharField(max_length=255, null=True)
     ha_weather = fields.JSONField(null=True)
 
     async def ha_update(self):
-        property = await self.property.filter(id=self.property_id).first()
-        self.ha_weather = await property.ha_getstate(self.ha_weather_entity_id)
-        self.ha_zone = await property.ha_getstate(self.ha_zone_entity_id)
+        self.ha_weather = await self.property.ha_getstate(self.ha_weather_entity_id)
+        self.ha_zone = await self.property.ha_getstate(self.ha_zone_entity_id)
         await self.save()

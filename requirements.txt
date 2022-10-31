@@ -10,3 +10,4 @@ strawberry-graphql[fastapi]
 tenacity
 aerich
 celery[redis]
+formulas

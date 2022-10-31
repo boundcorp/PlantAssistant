@@ -7,6 +7,9 @@ to read plant sensor data and manage plant lifecycle events.
 
 Not advised for use by anyone yet.  This is a work in progress.
 
+### Integration Diagram
+![HA Integration Diagram](./docs/images/diagram_1_ha_integration.png "HA Integration Diagram")
+
 ### Roadmap
 v0.1 Alpha - Headless MVP:
 - [x] Backend Setup - [FastAPI](https://fastapi.tiangolo.com), [TortoiseORM](https://tortoise.github.io),
@@ -18,6 +21,7 @@ v0.1 Alpha - Headless MVP:
 - [x] Property Model - a Property is a location connected to a HomeAssistant
 - [x] Garden Model - HomeAssistant zones used to group plants
 - [x] Plantings Model - Plantings are a group of plants in a Zone that share the same recipe
+- [ ] *WIP* Scheme Model - Schemes are recipes or instructions for growing (and monitoring) a planting
 - [ ] Onboarding API - Create first Property with HA URL and auth token
 - [ ] Garden API - Import Zones from HomeAssistant
 - [ ] Planting API - CRUD mutations for Plantings

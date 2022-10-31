@@ -10,6 +10,8 @@ class Planting(models.Model, common.UUID, common.Timestamp, common.Name):
     garden = fields.ForeignKeyRelation["Garden"](
         "models.Garden", related_name="plantings"
     )
-    recipe = fields.JSONField(default={})
+    scheme = fields.ForeignKeyRelation["Scheme"](
+        "models.Scheme", related_name="plantings"
+    )
     start_date = fields.DateField(null=True)
     end_date = fields.DateField(null=True)

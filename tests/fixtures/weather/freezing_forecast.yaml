@@ -1,0 +1,57 @@
+entity_id: weather.home
+state: partlycloudy
+attributes:
+  temperature: 45
+  temperature_unit: °F
+  humidity: 41
+  pressure: 30.07
+  pressure_unit: inHg
+  wind_bearing: 90
+  wind_speed: 1.1
+  wind_speed_unit: mph
+  visibility: 12
+  visibility_unit: mi
+  precipitation_unit: in
+  forecast:
+    - datetime: '2022-10-31T14:00:00+00:00'
+      precipitation_probability: 0
+      wind_bearing: 62
+      condition: partlycloudy
+      temperature: 66
+      templow: 41
+      wind_speed: 4.6
+      precipitation: 0
+    - datetime: '2022-11-01T14:00:00+00:00'
+      precipitation_probability: 84
+      wind_bearing: 227
+      condition: rainy
+      temperature: 55
+      templow: 29
+      wind_speed: 18.4
+      precipitation: 0.3
+    - datetime: '2022-11-02T14:00:00+00:00'
+      precipitation_probability: 28
+      wind_bearing: 266
+      condition: partlycloudy
+      temperature: 45
+      templow: 22
+      wind_speed: 8.1
+      precipitation: 0
+    - datetime: '2022-11-03T14:00:00+00:00'
+      precipitation_probability: 4
+      wind_bearing: 1
+      condition: sunny
+      temperature: 41
+      templow: 22
+      wind_speed: 5.8
+      precipitation: 0
+    - datetime: '2022-11-04T14:00:00+00:00'
+      precipitation_probability: 4
+      wind_bearing: 74
+      condition: partlycloudy
+      temperature: 55
+      templow: 32
+      wind_speed: 4.6
+      precipitation: 0
+  attribution: Data provided by AccuWeather
+  friendly_name: Home
