@@ -60,18 +60,27 @@ ha_install_fixture:
 	docker cp docker/homeassistant/$(FIXTURE) plantassistant_homeassistant_1:/tmp
 	dc exec homeassistant rm -rf /config/.storage
 	dc exec homeassistant cp -r /tmp/$(FIXTURE) /config/.storage
+	dc kill homeassistant
+	dc rm -f homeassistant
+	dc up -d homeassistant
 
 ha_install_fixture_empty_instance:
 	make ha_install_fixture FIXTURE=empty_instance
 
 ha_read_token:
-	dc exec homeassistant cat /config/.storage/auth | jq -r '.data.refresh_tokens[] | select(.token_type == "long_lived_access_token").token' | base64 -d
+	dc exec homeassistant cat /config/.storage/auth | jq -r '.data.refresh_tokens[] | select(.token_type == "long_lived_access_token")'
 
 # CI Pipeline & Tests
-test:
+
+pytest: # Base pytest command, plus any arguments
 	pytest
-docker_test:
-	dc run devcontainer make test
+
+docker_test: # Run tests in docker
+	dc run devcontainer make pytest
+
+test: # Shortcut for clearing HA docker data and running pytest in docker
+	make ha_install_fixture_empty_instance
+	make docker_test
 
 test_backend_coverage:
 	pytest --cov=plantassistant/app/ --cov-config=.coveragerc --cov-report html --cov-report term

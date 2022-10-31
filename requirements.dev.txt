@@ -4,6 +4,7 @@ pytest-mock
 mypy
 black
 flake8
+bpython
 autoflake
 httpx
 pytest-asyncio

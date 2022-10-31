@@ -1,6 +1,6 @@
-import yaml.reader
-from tortoise import fields, models
+import httpx
 import requests
+from tortoise import fields, models
 
 from plantassistant.app import common
 from plantassistant.app.locations.constants import GardenEnclosure
@@ -22,11 +22,21 @@ class Property(models.Model, common.UUID, common.Timestamp, common.Name):
     def ha_headers(self):
         return {"Authorization": "Bearer " + self.homeassistant_token, "Content-Type": "application/json"}
 
-    def get_ha(self, path, **kwargs):
-        return requests.get(self.homeassistant_url + path, headers=self.ha_headers, **kwargs)
+    async def ha_get(self, path, **kwargs):
+        async with httpx.AsyncClient() as client:
+            result = await client.get(self.homeassistant_url + path, headers=self.ha_headers, **kwargs)
+            return result.json()
 
-    def post_ha(self, path, **kwargs):
-        return requests.post(self.homeassistant_url + path, headers=self.ha_headers, **kwargs)
+    async def ha_post(self, path, data_json, **kwargs):
+        async with httpx.AsyncClient() as client:
+            result = await client.post(self.homeassistant_url + path, json=data_json, headers=self.ha_headers, **kwargs)
+            return result.json()
+
+    async def ha_setstate(self, entity_id, state_data):
+        return await self.ha_post(f"/api/states/{entity_id}", state_data)
+
+    async def ha_getstate(self, entity_id=""):
+        return await self.ha_get(f"/api/states/{entity_id}")
 
 
 class Garden(models.Model, common.UUID, common.Timestamp, common.Name):
@@ -40,14 +50,12 @@ class Garden(models.Model, common.UUID, common.Timestamp, common.Name):
 
     enclosure = fields.CharEnumField(GardenEnclosure, default=GardenEnclosure.OUTDOOR)
     ha_zone_entity_id = fields.CharField(max_length=255, null=True)
+    ha_zone = fields.JSONField(null=True)
     ha_weather_entity_id = fields.CharField(max_length=255, null=True)
+    ha_weather = fields.JSONField(null=True)
 
-    async def get_weather(self):
-        property = await self.property.get()
-        with open('tests/fixtures/weather/basic.yaml') as fh:
-            data = yaml.safe_load(fh)
-            set_weather = property.post_ha(f"/api/states/{self.ha_weather_entity_id}", json=data)
-            print(set_weather)
-        weather = property.get_ha(f"/api/states/{self.ha_weather_entity_id}").json()
-
-        return weather["state"]
+    async def ha_update(self):
+        property = await self.property.filter(id=self.property_id).first()
+        self.ha_weather = await property.ha_getstate(self.ha_weather_entity_id)
+        self.ha_zone = await property.ha_getstate(self.ha_zone_entity_id)
+        await self.save()

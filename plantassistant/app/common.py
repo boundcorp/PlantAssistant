@@ -11,4 +11,4 @@ class Timestamp:
 
 
 class Name:
-    name = fields.CharField(max_length=255)
+    name = fields.CharField(max_length=255, null=True)
