@@ -1,11 +1,6 @@
 import pytest
-import requests
 
-from tests.conftest import GardenScenario, HA_URL, HA_HEADERS, HA_TOKEN
-
-
-def ha_get(path, **kwargs):
-    return requests.get(HA_URL + path, headers=HA_HEADERS, **kwargs)
+from tests.conftest import GardenScenario, HA_URL, HA_TOKEN, PlantingScenario
 
 
 def skip_unless_ha(callable):
@@ -29,3 +24,10 @@ async def test_home_garden_weather(simple_garden: GardenScenario):
     await simple_garden.garden.ha_update()
 
     assert simple_garden.garden.ha_weather["state"] == 'cloudy'
+
+@skip_unless_ha
+@pytest.mark.anyio
+async def test_check_herbs_temperature(indoor_herbs: PlantingScenario):
+    await indoor_herbs.garden.ha_update()
+
+    assert indoor_herbs.plantings[0].recipe["name"] == "Indoor Herbs"

@@ -1,8 +1,8 @@
 -i https://pypi.org/simple
 tortoise-orm[asyncpg]
 fastapi
-requests
 passlib
+httpx
 python-jose[cryptography]
 fastapi-jwt-auth
 uvicorn[standard]

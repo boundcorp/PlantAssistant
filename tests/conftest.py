@@ -2,18 +2,24 @@ import json
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import List
 
 import jwt
 import pytest
 import yaml
+import logging
 from httpx import AsyncClient
 from tortoise import Tortoise
 from tortoise.queryset import QuerySetSingle
 
 from plantassistant.app.locations.constants import GardenEnclosure
 from plantassistant.app.locations.models import Property, Garden
+from plantassistant.app.plants.models import Planting
+from plantassistant.app.plants.recipes import IndoorHerbs
 from plantassistant.main import app
 from plantassistant.app.users.models import User
+
+log = logging.getLogger()
 
 DB_URL = "sqlite://:memory:"
 TEST_USER = {"email": "test@test.com", "password": "test123!!"}
@@ -24,10 +30,10 @@ async def init_db(db_url, create_db: bool = False, schemas: bool = False) -> Non
     from plantassistant.settings.test_settings import TORTOISE_INMEMORY_TEST
     await Tortoise.init(config=TORTOISE_INMEMORY_TEST, _create_db=create_db)
     if create_db:
-        print(f"Database created! {db_url = }")
+        log.info(f"Database created! {db_url = }")
     if schemas:
         await Tortoise.generate_schemas()
-        print("Success to generate schemas")
+        log.info("Success to generate schemas")
 
 
 async def init(db_url: str = DB_URL):
@@ -42,7 +48,6 @@ def anyio_backend():
 @pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(app=app, base_url="http://test") as client:
-        print("Client is ready")
         yield client
 
 
@@ -81,6 +86,7 @@ async def common_scenario(client: AsyncClient):
 
 def load_api_token_from_fixture(fixture_name):
     with open(f"docker/homeassistant/{fixture_name}/auth") as f:
+        log.info(f"Loading API token from docker/homeassistant/{fixture_name}")
         auth = json.load(f)
         api_keys = [token for token in auth["data"]["refresh_tokens"] if
                     token["token_type"] == "long_lived_access_token"]
@@ -112,20 +118,39 @@ class GardenScenario(CommonScenario):
 @pytest.fixture(scope="session")
 async def simple_garden(common_scenario: CommonScenario):
     """
-    Register the home property and create a herb garden on an indoor windowsill
+    Register the home property and create a garden
     """
     _property = await Property.create(name="Test Home",
-                                     owner_id=common_scenario.test_user.pk,
-                                     homeassistant_url=HA_URL,
-                                     homeassistant_token=HA_TOKEN)
+                                      owner_id=common_scenario.test_user.pk,
+                                      homeassistant_url=HA_URL,
+                                      homeassistant_token=HA_TOKEN)
     _garden = await Garden.create(name="Test Outdoor Garden", property=_property, enclosure=GardenEnclosure.OUTDOOR,
-                                 ha_zone_entity_id="zone.home", ha_weather_entity_id="weather.home")
+                                  ha_zone_entity_id="zone.home", ha_weather_entity_id="weather.home")
 
     with open('tests/fixtures/weather/basic.yaml') as fh:
         set_weather = await _property.ha_setstate(_garden.ha_weather_entity_id, yaml.safe_load(fh))
+        log.info("FORCED: updated weather fixture in HomeAssistant", set_weather)
 
     return GardenScenario(
         **common_scenario.__dict__,
         property=_property,
         garden=_garden,
+    )
+
+
+@dataclass
+class PlantingScenario(GardenScenario):
+    plantings: List[Planting]
+
+
+@pytest.fixture(scope="session")
+async def indoor_herbs(simple_garden: GardenScenario):
+    """
+    Create a planting of some indoor herbs
+    """
+    return PlantingScenario(
+        **simple_garden.__dict__,
+        plantings=[
+            await Planting.create(name="Basil", garden=simple_garden.garden, recipe=IndoorHerbs.json()),
+        ]
     )
