@@ -1,7 +1,10 @@
+from unittest import skip
+
 import pytest
 import yaml
 import logging
 
+from plantassistant.app.plants.models import SensorAttributes
 from tests.conftest import GardenScenario, HA_URL, HA_TOKEN, PlantingScenario
 log = logging.getLogger()
 
@@ -32,7 +35,16 @@ async def test_home_garden_weather(indoor_garden):
     assert indoor_garden.garden.ha_weather["state"] == 'cloudy'
 
 @pytest.mark.anyio
+@pytest.mark.skip
 async def test_check_herbs_temperature(indoor_herbs: PlantingScenario):
     herbs = indoor_herbs.plantings[0]
     scheme = await herbs.scheme
     assert scheme.name == "Indoor Herbs"
+    assert False, "TODO: check the temperature of the herbs"
+
+
+@pytest.mark.anyio
+async def test_check_outdoor_fruits_temperature(outdoor_fruits: PlantingScenario):
+    tomato = outdoor_fruits.plantings[0]
+    readings = await tomato.get_sensor_readings()
+    assert readings[SensorAttributes.TEMPERATURE] == 61.0, "Fixture should have set the temperature to 61.0"

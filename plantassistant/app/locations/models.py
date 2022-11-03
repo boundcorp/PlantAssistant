@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 import httpx
 import requests
 from tortoise import fields, models
+from tortoise.timezone import now
 
 from plantassistant.app import common
 from plantassistant.app.locations.constants import GardenEnclosure
@@ -36,7 +39,38 @@ class Property(models.Model, common.UUID, common.Timestamp, common.Name):
         return await self.ha_post(f"/api/states/{entity_id}", state_data)
 
     async def ha_getstate(self, entity_id=""):
-        return await self.ha_get(f"/api/states/{entity_id}")
+        update_window = now() - timedelta(minutes=5)
+        cached = await PropertyStateUpdate.filter(
+            property_id=self.pk,
+            ha_entity_id=entity_id,
+            reading_at__gt=update_window
+        ).order_by(
+            "-reading_at").first()
+        if cached:
+            return cached.state
+        else:
+            state = await self.ha_get(f"/api/states/{entity_id}")
+            await PropertyStateUpdate.create(
+                property_id=self.pk,
+                entity_id=entity_id,
+                state=state,
+                reading_at=now()
+            )
+            return state
+
+
+class PropertyStateUpdate(models.Model, common.UUID):
+    """
+    The PropertyStateUpdate model corresponds to a state update from a HomeAssistant installation
+    """
+
+    property = fields.ForeignKeyRelation["Property"](
+        "models.Property", related_name="state_updates"
+    )
+
+    ha_entity_id = fields.CharField(max_length=255, null=True)
+    reading_at = fields.DatetimeField(index=True)
+    state = fields.JSONField(null=True)
 
 
 class Garden(models.Model, common.UUID, common.Timestamp, common.Name):

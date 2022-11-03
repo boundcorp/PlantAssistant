@@ -14,8 +14,7 @@ from tortoise.queryset import QuerySetSingle
 
 from plantassistant.app.locations.constants import GardenEnclosure
 from plantassistant.app.locations.models import Property, Garden
-from plantassistant.app.plants.models import Planting
-from plantassistant.app.plants.recipes import IndoorHerbs
+from plantassistant.app.plants.models import Planting, SensorAttributes, PlantingSensor
 from plantassistant.app.schemes.models import Scheme
 from plantassistant.app_setup import app
 from plantassistant.app.users.models import User
@@ -145,6 +144,7 @@ async def indoor_garden(common_scenario: CommonScenario):
         garden=garden,
     )
 
+
 @pytest.fixture(scope="session")
 async def outdoor_garden(common_scenario: CommonScenario):
     """
@@ -186,13 +186,15 @@ async def outdoor_fruits(outdoor_garden: GardenScenario):
     Create a planting of some outdoor fruits
     """
     fruits_scheme = await Scheme.create(name="Outdoor Fruits", owner_id=outdoor_garden.test_user.pk)
+    tomato = await Planting.create(name="Tomato", garden=outdoor_garden.garden, scheme=fruits_scheme)
+    await PlantingSensor.create(name="Tomato Temperature Sensor", planting=tomato,
+                                attribute=SensorAttributes.TEMPERATURE, ha_sensor_path="weather.home#temperature")
 
     return PlantingScenario(
         **outdoor_garden.__dict__,
-        plantings=[
-            await Planting.create(name="Tomato", garden=outdoor_garden.garden, scheme=fruits_scheme),
-        ]
+        plantings=[tomato]
     )
+
 
 @pytest.fixture(scope="session")
 async def indoor_herbs(indoor_garden):
@@ -200,9 +202,11 @@ async def indoor_herbs(indoor_garden):
     Create a planting of some indoor herbs
     """
     herbs_scheme = await Scheme.create(name="Indoor Herbs", owner_id=indoor_garden.test_user.pk)
+    herbs = await Planting.create(name="Basil", garden=indoor_garden.garden, scheme=herbs_scheme)
+    #await PlantingSensor.create(name="Basil Temperature Sensor", planting=herbs, attribute=SensorAttributes.TEMPERATURE)
+    # TODO: Add a sensor to the planting
+
     return PlantingScenario(
         **indoor_garden.__dict__,
-        plantings=[
-            await Planting.create(name="Basil", garden=indoor_garden.garden, scheme=herbs_scheme),
-        ]
+        plantings=[herbs, ]
     )

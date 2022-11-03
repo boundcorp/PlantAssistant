@@ -1,4 +1,3 @@
-import formulas as formulas
 from tortoise import fields, models
 from tortoise.validators import MinValueValidator
 
@@ -17,12 +16,6 @@ class Scheme(models.Model, common.UUID, common.Timestamp, common.Name):
 
     description = fields.TextField(null=True)
 
-    def evaluate_planting(self, planting: Planting):
-        for condition in self.rules.all():
-            func = formulas.Parser().ast(f"={condition}")[1].compile()
-            print(func.inputs, func)
-            print(func())
-
 
 class Rule(models.Model, common.UUID, common.Timestamp, common.Name):
     """
@@ -33,5 +26,5 @@ class Rule(models.Model, common.UUID, common.Timestamp, common.Name):
     )
     order_in_scheme = fields.IntField(validators=[MinValueValidator(0)])
 
-    rule_method = fields.CharEnumField[RuleMethods]()
+    rule_method = fields.CharEnumField(RuleMethods)
     arguments = fields.JSONField(null=True)

@@ -74,7 +74,6 @@ services:
     ports:
       - "6379:6379"
 
-
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:2022.10.5
     ports:
