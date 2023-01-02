@@ -41,6 +41,21 @@ services:
     command: python3 app.py
     ports:
       - 9234:9234
+  admin:
+    extends:
+      service: devcontainer
+      file: docker/docker-compose._base.yml
+    links:
+      - postgres
+      - redis
+      - homeassistant
+    volumes:
+      - .:/workspace/plantassistant
+    environment:
+      - DATABASE_URL=postgres://dev:passw0rd@postgres:5432/dev
+    command: python3 admin.py
+    ports:
+      - 9988:9988
 
   celery_worker:
     extends:

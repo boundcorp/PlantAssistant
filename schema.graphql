@@ -1,0 +1,110 @@
+schema {
+  query: Query
+  mutation: FastAdminMutation
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+type FastAdminMutation {
+  createUser(input: UserInput!): User!
+  createProperty(input: PropertyInput!): Property!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+type Property {
+  """"""
+  id: UUID
+
+  """"""
+  createdAt: DateTime
+
+  """"""
+  modifiedAt: DateTime
+
+  """"""
+  name: String
+
+  """"""
+  homeassistantUrl: String
+
+  """"""
+  homeassistantToken: String
+}
+
+input PropertyInput {
+  """"""
+  id: UUID = null
+
+  """"""
+  createdAt: DateTime = null
+
+  """"""
+  modifiedAt: DateTime = null
+
+  """"""
+  name: String = null
+
+  """"""
+  homeassistantUrl: String = null
+
+  """"""
+  homeassistantToken: String = null
+}
+
+type PropertyListResult {
+  items: [Property!]!
+  total: Int!
+}
+
+type Query {
+  getUser(id: String!): User!
+  listUser: UserListResult!
+  getProperty(id: String!): Property!
+  listProperty: PropertyListResult!
+  getTables: [TableOutput!]!
+}
+
+type TableOutput {
+  name: String!
+  resources: JSON!
+}
+
+scalar UUID
+
+type User {
+  """"""
+  id: UUID
+
+  """"""
+  createdAt: DateTime
+
+  """"""
+  modifiedAt: DateTime
+
+  """This is a username"""
+  email: String!
+}
+
+input UserInput {
+  """"""
+  id: UUID = null
+
+  """"""
+  createdAt: DateTime = null
+
+  """"""
+  modifiedAt: DateTime = null
+
+  """This is a username"""
+  email: String!
+}
+
+type UserListResult {
+  items: [User!]!
+  total: Int!
+}

@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+tortoise-orm = {extras = ["asyncpg"], version = "*"}
+fastapi = "*"
+passlib = "*"
+httpx = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+fastapi-jwt-auth = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+strawberry-graphql = {extras = ["fastapi"], version = "*"}
+tenacity = "*"
+aerich = "*"
+celery = {extras = ["redis"], version = "*"}
+formulas = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
